@@ -1,0 +1,15 @@
+language: erlang
+otp_release:
+  - 19.2
+install:
+  - ./rebar3 compile
+  - ./rebar3 update
+before_script:
+  - epmd -daemon
+script:
+  - ./rebar3 ct
+notifications:
+  email: christopher.meiklejohn@gmail.com
+  slack: lasp-lang:hiPRNnbUa3zdGrrXZfGRAF7D
+  irc: "irc.freenode.org#lasp-lang"
+sudo: false

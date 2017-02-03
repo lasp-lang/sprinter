@@ -1,0 +1,16 @@
+{application, sprinter,
+ [{description, "Service discovery with Mesos and Kubernetes."},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, { sprinter_app, []}},
+  {applications,
+   [kernel,
+    stdlib
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {maintainers, []},
+  {licenses, []},
+  {links, []}
+ ]}.
