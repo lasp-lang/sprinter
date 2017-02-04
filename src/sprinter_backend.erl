@@ -31,6 +31,7 @@
          start_link/1,
          graph/0,
          tree/0,
+         orchestration/0,
          was_connected/0,
          servers/0,
          nodes/0]).
@@ -79,6 +80,9 @@ tree() ->
 
 was_connected() ->
     gen_server:call(?MODULE, was_connected, infinity).
+
+orchestration() ->
+    gen_server:call(?MODULE, orchestration, infinity).
 
 -spec servers() -> {ok, [node()]}.
 servers() ->
@@ -191,6 +195,15 @@ handle_call(nodes, _From, #state{nodes=Nodes}=State) ->
 
 handle_call(servers, _From, #state{servers=Servers}=State) ->
     {reply, {ok, Servers}, State};
+
+handle_call(orchestration, _From, #state{backend=Backend}=State) ->
+    Result = case Backend of
+        undefined ->
+            false;
+        _ ->
+            true
+    end,
+    {reply, Result, State};
 
 handle_call(was_connected, _From, #state{was_connected=WasConnected}=State) ->
     {reply, {ok, WasConnected}, State};
