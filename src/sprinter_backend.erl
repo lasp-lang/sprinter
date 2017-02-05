@@ -32,6 +32,7 @@
          graph/0,
          tree/0,
          orchestration/0,
+         orchestrated/0,
          was_connected/0,
          servers/0,
          nodes/0]).
@@ -83,6 +84,9 @@ was_connected() ->
 
 orchestration() ->
     gen_server:call(?MODULE, orchestration, infinity).
+
+orchestrated() ->
+    gen_server:call(?MODULE, orchestrated, infinity).
 
 -spec servers() -> {ok, [node()]}.
 servers() ->
@@ -197,6 +201,17 @@ handle_call(servers, _From, #state{servers=Servers}=State) ->
     {reply, {ok, Servers}, State};
 
 handle_call(orchestration, _From, #state{backend=Backend}=State) ->
+    Result = case Backend of
+        undefined ->
+            false;
+        sprinter_mesos ->
+            mesos;
+        sprinter_kubernetes ->
+            kubernetes
+    end,
+    {reply, {ok, Result}, State};
+
+handle_call(orchestrated, _From, #state{backend=Backend}=State) ->
     Result = case Backend of
         undefined ->
             false;
