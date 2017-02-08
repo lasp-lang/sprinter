@@ -45,6 +45,10 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
+    TagDefault = list_to_atom(os:getenv("TAG", "undefined")),
+    Tag = application:get_env(?APP, tag, TagDefault),
+    sprinter_config:set(tag, Tag),
+
     EvaluationIdDefault = list_to_atom(os:getenv("EVAL_ID", "undefined")),
     EvaluationId = application:get_env(?APP,
                                        evaluation_identifier,

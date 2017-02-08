@@ -130,15 +130,15 @@ init([]) ->
 
             %% Only construct the graph and attempt to repair the graph
             %% from the designated server node.
-            case partisan_config:get(tag, client) of
+            case sprinter_config:get(tag, client) of
                 server ->
-                    lager:info("Partisan tag is server."),
+                    lager:info("Tag is server."),
                     schedule_build_graph();
                 client ->
-                    lager:info("Partisan tag is client."),
+                    lager:info("Tag is client."),
                     ok;
                 undefined ->
-                    lager:info("Partisan tag is undefined."),
+                    lager:info("Tag is undefined."),
                     ok
             end,
 
