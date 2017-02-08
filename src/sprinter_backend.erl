@@ -132,10 +132,13 @@ init([]) ->
             %% from the designated server node.
             case partisan_config:get(tag, client) of
                 server ->
+                    lager:info("Partisan tag is server."),
                     schedule_build_graph();
                 client ->
+                    lager:info("Partisan tag is client."),
                     ok;
                 undefined ->
+                    lager:info("Partisan tag is undefined."),
                     ok
             end,
 
