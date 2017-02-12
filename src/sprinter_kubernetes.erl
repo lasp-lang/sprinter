@@ -31,13 +31,13 @@
 %% @private
 upload_artifact(#state{eredis=Eredis}, Node, Membership) ->
     {ok, <<"OK">>} = eredis:q(Eredis, ["SET", Node, Membership]),
-    lager:info("Pushed artifact to Redis: ~p ~p", [Node, Membership]),
+    lager:info("Pushed artifact to Redis: ~p", [Node]),
     ok.
 
 %% @private
 download_artifact(#state{eredis=Eredis}, Node) ->
     {ok, Membership} = eredis:q(Eredis, ["GET", Node]),
-    lager:info("Received artifact from Redis: ~p ~p", [Node, Membership]),
+    lager:info("Received artifact from Redis: ~p", [Node]),
     Membership.
 
 %% @private

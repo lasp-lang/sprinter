@@ -359,16 +359,8 @@ handle_info(?BUILD_GRAPH_MESSAGE, #state{backend=Backend,
     Graph = digraph:new(),
     Orphaned = populate_graph(State, Nodes, Graph),
 
-    {Vertices, Edges} = vertices_and_edges(Graph),
-    lager:info("Vertices: ~p Edges: ~p", [Vertices, Edges]),
-
     {SymmetricViews, VisitedNames} = breadth_first(node(), Graph, ordsets:new()),
     AllNodesVisited = length(Nodes) == length(VisitedNames),
-
-    lager:info("Nodes (~p) ~p", [length(Nodes), Nodes]),
-    lager:info("VisitedNames (~p) ~p", [length(VisitedNames), VisitedNames]),
-    lager:info("SymmetricViews ~p", [SymmetricViews]),
-    lager:info("AllNodesVisited ~p", [AllNodesVisited]),
 
     Connected = SymmetricViews andalso AllNodesVisited,
 
