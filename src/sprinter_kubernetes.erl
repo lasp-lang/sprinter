@@ -36,9 +36,13 @@ upload_artifact(#state{eredis=Eredis}, Node, Membership) ->
 
 %% @private
 download_artifact(#state{eredis=Eredis}, Node) ->
-    {ok, Membership} = eredis:q(Eredis, ["GET", Node]),
-    lager:info("Received artifact from Redis: ~p", [Node]),
-    Membership.
+    case eredis:q(Eredis, ["GET", Node]) of
+        {ok, Membership} ->
+            lager:info("Received artifact from Redis: ~p", [Node]),
+            Membership;
+        {error,no_connection} ->
+            undefined
+    end.
 
 %% @private
 clients() ->
