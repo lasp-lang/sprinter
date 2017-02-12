@@ -470,7 +470,7 @@ breadth_first(Root, Graph, Visited0) ->
 %% @private
 prefix(File) ->
     EvalTimestamp = sprinter_config:get(evaluation_timestamp, 0),
-    integer_to_list(EvalTimestamp) ++ "/" ++ File.
+    "sprinter" ++ "/" ++ integer_to_list(EvalTimestamp) ++ "/" ++ File.
 
 %% @private
 schedule_build_graph() ->
