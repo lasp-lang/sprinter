@@ -48,13 +48,13 @@
 %% debug functions
 -export([debug_get_tree/2]).
 
--define(REFRESH_INTERVAL, 20000).
+-define(REFRESH_INTERVAL, 1000).
 -define(REFRESH_MESSAGE,  refresh).
 
--define(BUILD_GRAPH_INTERVAL, 20000).
+-define(BUILD_GRAPH_INTERVAL, 5000).
 -define(BUILD_GRAPH_MESSAGE,  build_graph).
 
--define(ARTIFACT_INTERVAL, 20000).
+-define(ARTIFACT_INTERVAL, 1000).
 -define(ARTIFACT_MESSAGE,  artifact).
 
 -include("sprinter.hrl").
