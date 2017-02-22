@@ -325,15 +325,15 @@ handle_info(?ARTIFACT_MESSAGE, #state{peer_service=PeerService}=State) ->
 handle_info(?BUILD_GRAPH_MESSAGE, #state{backend=Backend,
                                          peer_service=PeerService,
                                          was_connected=WasConnected0}=State) ->
-    _ = lager:info("Beginning graph analysis."),
+    % _ = lager:info("Beginning graph analysis."),
 
     %% Get all running nodes, because we need the list of *everything*
     %% to analyze the graph for connectedness.
     Servers = Backend:servers(),
-    lager:info("Found servers: ~p", [sets:to_list(Servers)]),
+    % lager:info("Found servers: ~p", [sets:to_list(Servers)]),
 
     Clients = Backend:clients(),
-    lager:info("Found clients: ~p", [sets:to_list(Clients)]),
+    % lager:info("Found clients: ~p", [sets:to_list(Clients)]),
 
     ServerNames = node_names(sets:to_list(Servers)),
     ClientNames = node_names(sets:to_list(Clients)),
