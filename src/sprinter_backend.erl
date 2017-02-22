@@ -119,7 +119,7 @@ init([]) ->
             lager:info("Not using container orchestration; disabling."),
             ok;
         Backend ->
-            lager:info("Backend: ~p", [Backend]),
+            % lager:info("Backend: ~p", [Backend]),
 
             case Backend of
                 sprinter_mesos ->
@@ -253,13 +253,13 @@ handle_info(?REFRESH_MESSAGE, #state{backend=Backend,
     PeerServiceManager = lasp_config:peer_service_manager(),
 
     Servers = Backend:servers(),
-    lager:info("Found servers: ~p", [sets:to_list(Servers)]),
+    % lager:info("Found servers: ~p", [sets:to_list(Servers)]),
 
     Clients = Backend:clients(),
-    lager:info("Found clients: ~p", [sets:to_list(Clients)]),
+    % lager:info("Found clients: ~p", [sets:to_list(Clients)]),
 
-    {ok, Membership} = PeerService:members(),
-    lager:info("Membership (~p) ~p", [length(Membership), Membership]),
+    % {ok, Membership} = PeerService:members(),
+    % lager:info("Membership (~p) ~p", [length(Membership), Membership]),
 
     %% Get list of nodes to connect to: this specialized logic isn't
     %% required when the node count is small, but is required with a
@@ -366,12 +366,14 @@ handle_info(?BUILD_GRAPH_MESSAGE, #state{backend=Backend,
 
     case Connected of
         true ->
-            lager:info("Graph is connected!");
+            % lager:info("Graph is connected!");
+            ok;
         false ->
             lager:info("Visited ~p from ~p: ~p", [length(VisitedNames), node(), VisitedNames]),
             {ok, ServerMembership} = PeerService:members(),
             lager:info("Membership (~p) ~p", [length(ServerMembership), ServerMembership]),
-            lager:info("Graph is not connected!")
+            lager:info("Graph is not connected!"),
+            ok
     end,
 
     WasConnected = Connected orelse WasConnected0,
