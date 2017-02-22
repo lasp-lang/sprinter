@@ -469,8 +469,9 @@ breadth_first(Root, Graph, Visited0) ->
 
 %% @private
 prefix(File) ->
+    EvalIdentifier = sprinter_config:get(evaluation_identifier, undefined),
     EvalTimestamp = sprinter_config:get(evaluation_timestamp, 0),
-    "sprinter" ++ "/" ++ integer_to_list(EvalTimestamp) ++ "/" ++ File.
+    "sprinter" ++ "/" ++ atom_to_list(EvalIdentifier) ++ "/" ++ integer_to_list(EvalTimestamp) ++ "/" ++ File.
 
 %% @private
 schedule_build_graph() ->
