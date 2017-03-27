@@ -107,6 +107,7 @@ generate_pod_nodes(#{<<"items">> := Items}) ->
                             Acc
                     end
                 end,
+                [],
                 Items
             ),
             sets:from_list(Nodes)
