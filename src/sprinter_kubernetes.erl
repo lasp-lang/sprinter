@@ -81,14 +81,28 @@ generate_pod_nodes(#{<<"items">> := Items}) ->
         _ ->
             Nodes = lists:foldr(
                 fun(Item, Acc) ->
-                    #{<<"metadata">> := Metadata} = Item,
-                    #{<<"name">> := Name} = Metadata,
-                    #{<<"status">> := Status} = Item,
-                    case maps:is_key(<<"podIP">>, Status) of
+
+                    %% get name if defined
+                    Name = case maps:is_key(<<"metadata">>, Item) of
                         true ->
-                            #{<<"podIP">> := PodIP} = Status,
-                            Node = generate_pod_node(Name, PodIP),
-                            [Node | Acc];
+                            Metadata = maps:get(<<"metadata">>, Item),
+                            maps:get(<<"name">>, Metadata, undefined);
+                        false ->
+                            undefined
+                    end,
+
+                    %% get pod ip if defined
+                    PodIP = case maps:is_key(<<"status">>, Item) of
+                        true ->
+                            Status = maps:get(<<"status">>, Item),
+                            maps:get(<<"podIP">>, Status, undefined);
+                        false ->
+                            undefined
+                    end,
+
+                    case Name /= undefined andalso PodIP /= undefined of
+                        true ->
+                            [generate_pod_node(Name, PodIP) | Acc];
                         false ->
                             Acc
                     end
