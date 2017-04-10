@@ -323,9 +323,15 @@ handle_info(?ARTIFACT_MESSAGE, #state{peer_service=PeerService}=State) ->
 
     {noreply, State};
 handle_info(?BUILD_GRAPH_MESSAGE, #state{backend=Backend,
+                                         graph=Graph0,
+                                         tree=Tree0,
                                          peer_service=PeerService,
                                          was_connected=WasConnected0}=State) ->
     % _ = lager:info("Beginning graph analysis."),
+    
+    %% Delete existing graphs to prevent ets table leak.
+    digraph:delete(Tree0),
+    digraph:delete(Graph0),
 
     %% Get all running nodes, because we need the list of *everything*
     %% to analyze the graph for connectedness.
