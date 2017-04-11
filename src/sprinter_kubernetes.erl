@@ -36,11 +36,19 @@ upload_artifact(#state{eredis=Eredis}, Node, Membership) ->
 
 %% @private
 download_artifact(#state{eredis=Eredis}, Node) ->
-    case eredis:q(Eredis, ["GET", Node]) of
-        {ok, Membership} ->
-            % lager:info("Received artifact from Redis: ~p", [Node]),
-            Membership;
-        {error,no_connection} ->
+    lager:info("Retrieving object ~p from redis.", [Node]),
+
+    try
+        case eredis:q(Eredis, ["GET", Node]) of
+            {ok, Membership} ->
+                % lager:info("Received artifact from Redis: ~p", [Node]),
+                Membership;
+            {error,no_connection} ->
+                undefined
+        end
+    catch
+        _:Error ->
+            lager:info("Exception caught: ~p", [Error]),
             undefined
     end.
 
