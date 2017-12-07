@@ -22,9 +22,10 @@
 -author("Christopher S. Meiklejohn <christopher.meiklejohn@gmail.com>").
 
 -include("sprinter.hrl").
+-behaviour(sprinter_backend).
 
--export([clients/0,
-         servers/0,
+-export([clients/1,
+         servers/1,
          upload_artifact/3,
          download_artifact/2]).
 
@@ -53,13 +54,13 @@ download_artifact(#state{eredis=Eredis}, Node) ->
     end.
 
 %% @private
-clients() ->
+clients(_State) ->
     EvalTimestamp = sprinter_config:get(evaluation_timestamp, 0),
     LabelSelector = "tag%3Dclient,evaluation-timestamp%3D" ++ integer_to_list(EvalTimestamp),
     pods_from_kubernetes(LabelSelector).
 
 %% @private
-servers() ->
+servers(_State) ->
     EvalTimestamp = sprinter_config:get(evaluation_timestamp, 0),
     LabelSelector = "tag%3Dserver,evaluation-timestamp%3D" ++ integer_to_list(EvalTimestamp),
     pods_from_kubernetes(LabelSelector).
