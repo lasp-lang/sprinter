@@ -59,6 +59,11 @@
 
 -include("sprinter.hrl").
 
+-callback(clients(term()) -> term()).
+-callback(servers(term()) -> term()).
+-callback(download_artifact(term(), node()) -> term()).
+-callback(upload_artifact(term(), node(), term()) -> term()).
+
 %%%===================================================================
 %%% API
 %%%===================================================================
@@ -103,12 +108,14 @@ nodes() ->
 %% @private
 -spec init([]) -> {ok, #state{}}.
 init([]) ->
-    Backend = case {os:getenv("MESOS_TASK_ID"), os:getenv("KUBERNETES_PORT")} of
-        {Value, false} when is_list(Value) ->
+    Backend = case {os:getenv("MESOS_TASK_ID"), os:getenv("KUBERNETES_PORT"), os:getenv("DOCKER_COMPOSE")} of
+        {Value, false, false} when is_list(Value) ->
             sprinter_mesos;
-        {false, Value} when is_list(Value) ->
+        {false, Value, false} when is_list(Value) ->
             sprinter_kubernetes;
-        {_, _} ->
+        {false, false, Value} when is_list(Value) ->
+            sprinter_compose;
+        {_, _, _} ->
             undefined
     end,
 
@@ -173,6 +180,11 @@ init([]) ->
 
     Eredis = case Backend of
         sprinter_kubernetes ->
+            RedisHost = os:getenv("REDIS_SERVICE_HOST", "127.0.0.1"),
+            RedisPort = os:getenv("REDIS_SERVICE_PORT", "6379"),
+            {ok, C} = eredis:start_link(RedisHost, list_to_integer(RedisPort)),
+            C;
+        sprinter_compose ->
             RedisHost = os:getenv("REDIS_SERVICE_HOST", "127.0.0.1"),
             RedisPort = os:getenv("REDIS_SERVICE_PORT", "6379"),
             {ok, C} = eredis:start_link(RedisHost, list_to_integer(RedisPort)),
@@ -252,11 +264,11 @@ handle_info(?REFRESH_MESSAGE, #state{backend=Backend,
     Tag = partisan_config:get(tag, client),
     PeerServiceManager = lasp_config:peer_service_manager(),
 
-    Servers = Backend:servers(),
-    % lager:info("Found servers: ~p", [sets:to_list(Servers)]),
+    Servers = Backend:servers(State),
+    lager:info("Found servers: ~p", [sets:to_list(Servers)]),
 
-    Clients = Backend:clients(),
-    % lager:info("Found clients: ~p", [sets:to_list(Clients)]),
+    Clients = Backend:clients(State),
+    lager:info("Found clients: ~p", [sets:to_list(Clients)]),
 
     % {ok, Membership} = PeerService:members(),
     % lager:info("Membership (~p) ~p", [length(Membership), Membership]),
@@ -317,7 +329,14 @@ handle_info(?ARTIFACT_MESSAGE, #state{peer_service=PeerService}=State) ->
     %% Store membership.
     Node = prefix(atom_to_list(node())),
     Membership = term_to_binary(Nodes),
+    lager:info("Membership for node ~p: ~p", [Node, Nodes]),
     upload_artifact(State, Node, Membership),
+
+    %% Store membership with node tag.
+    Tag = sprinter_config:get(tag, client),
+    TaggedNode = prefix(atom_to_list(Tag) ++ "/" ++ atom_to_list(node())),
+    Membership = term_to_binary(Nodes),
+    upload_artifact(State, TaggedNode, Membership),
 
     schedule_artifact_upload(),
 
@@ -335,10 +354,10 @@ handle_info(?BUILD_GRAPH_MESSAGE, #state{backend=Backend,
 
     %% Get all running nodes, because we need the list of *everything*
     %% to analyze the graph for connectedness.
-    Servers = Backend:servers(),
+    Servers = Backend:servers(State),
     % lager:info("Found servers: ~p", [sets:to_list(Servers)]),
 
-    Clients = Backend:clients(),
+    Clients = Backend:clients(State),
     % lager:info("Found clients: ~p", [sets:to_list(Clients)]),
 
     ServerNames = node_names(sets:to_list(Servers)),
@@ -514,7 +533,9 @@ vertices_and_edges(Graph) ->
 %% @private
 node_names([]) ->
     [];
-node_names([{Name, _Ip, _Port}|T]) ->
+node_names([#{name := Name}|T]) ->
+    [Name|node_names(T)];
+node_names([Name|T]) ->
     [Name|node_names(T)].
 
 %% @private

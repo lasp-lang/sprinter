@@ -22,9 +22,10 @@
 -author("Christopher S. Meiklejohn <christopher.meiklejohn@gmail.com>").
 
 -include("sprinter.hrl").
+-behaviour(sprinter_backend).
 
--export([clients/0,
-         servers/0,
+-export([clients/1,
+         servers/1,
          bucket_name/0,
          upload_artifact/3,
          download_artifact/2]).
@@ -51,13 +52,13 @@ upload_artifact(_State, Node, Membership) ->
     end.
 
 %% @private
-clients() ->
+clients(_State) ->
     EvalTimestamp = sprinter_config:get(evaluation_timestamp, 0),
     ClientApp = "lasp-client-" ++ integer_to_list(EvalTimestamp),
     app_tasks_from_marathon(ClientApp).
 
 %% @private
-servers() ->
+servers(_State) ->
     EvalTimestamp = sprinter_config:get(evaluation_timestamp, 0),
     ServerApp = "lasp-server-" ++ integer_to_list(EvalTimestamp),
     app_tasks_from_marathon(ServerApp).
@@ -107,7 +108,7 @@ generate_mesos_nodes(#{<<"app">> := App}) ->
 generate_mesos_node(Host, PeerPort) ->
     Name = "lasp-" ++ integer_to_list(PeerPort) ++ "@" ++ binary_to_list(Host),
     {ok, IPAddress} = inet_parse:address(binary_to_list(Host)),
-    Node = {list_to_atom(Name), IPAddress, PeerPort},
+    Node = #{name => Name, listen_addrs => [#{ip => IPAddress, port => PeerPort}]},
     Node.
 
 %% @private
