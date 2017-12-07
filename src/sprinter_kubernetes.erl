@@ -126,7 +126,8 @@ generate_pod_nodes(#{<<"items">> := Items}) ->
 generate_pod_node(Name, Host) ->
     {ok, IPAddress} = inet_parse:address(binary_to_list(Host)),
     Port = list_to_integer(os:getenv("PEER_PORT", "9090")),
-    {list_to_atom(binary_to_list(Name) ++ "@" ++ binary_to_list(Host)), IPAddress, Port}.
+    #{name => list_to_atom(binary_to_list(Name) ++ "@" ++ binary_to_list(Host)), 
+      listen_addrs => [#{ip => IPAddress, port => Port}]}.
 
 %% @private
 get_request(Url, DecodeFun) ->

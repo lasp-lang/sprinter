@@ -108,7 +108,7 @@ generate_mesos_nodes(#{<<"app">> := App}) ->
 generate_mesos_node(Host, PeerPort) ->
     Name = "lasp-" ++ integer_to_list(PeerPort) ++ "@" ++ binary_to_list(Host),
     {ok, IPAddress} = inet_parse:address(binary_to_list(Host)),
-    Node = {list_to_atom(Name), IPAddress, PeerPort},
+    Node = #{name => Name, listen_addrs => [#{ip => IPAddress, port => PeerPort}]},
     Node.
 
 %% @private

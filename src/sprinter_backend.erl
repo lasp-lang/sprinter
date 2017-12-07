@@ -533,7 +533,7 @@ vertices_and_edges(Graph) ->
 %% @private
 node_names([]) ->
     [];
-node_names([{Name, _Ip, _Port}|T]) ->
+node_names([#{name := Name}|T]) ->
     [Name|node_names(T)];
 node_names([Name|T]) ->
     [Name|node_names(T)].
