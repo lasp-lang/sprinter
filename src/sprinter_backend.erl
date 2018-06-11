@@ -301,6 +301,16 @@ handle_info(?REFRESH_MESSAGE, #state{backend=Backend,
             %% do nothing -- force all connection to go through the
             %% server.
             sets:new();
+        {client, partisan_hyparview_xbot_peer_service_manager} ->
+            %% If we're the server, and we're in HyParView, clients will
+            %% ask the server to join the overlay and force outbound
+            %% conenctions to the clients.
+            Servers;
+        {server, partisan_hyparview_xbot_peer_service_manager} ->
+            %% If we're in HyParView, and we're a client, only ever
+            %% do nothing -- force all connection to go through the
+            %% server.
+            sets:new();
         {Tag, PeerServiceManager} ->
             %% Catch all.
             lager:info("Invalid mode: not connecting to any nodes."),
