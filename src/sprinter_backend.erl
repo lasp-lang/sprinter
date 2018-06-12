@@ -265,10 +265,10 @@ handle_info(?REFRESH_MESSAGE, #state{backend=Backend,
     PeerServiceManager = lasp_config:peer_service_manager(),
 
     Servers = Backend:servers(State),
-    lager:info("Found servers: ~p", [sets:to_list(Servers)]),
+    % lager:info("Found servers: ~p", [sets:to_list(Servers)]),
 
     Clients = Backend:clients(State),
-    lager:info("Found clients: ~p", [sets:to_list(Clients)]),
+    % lager:info("Found clients: ~p", [sets:to_list(Clients)]),
 
     % {ok, Membership} = PeerService:members(),
     % lager:info("Membership (~p) ~p", [length(Membership), Membership]),
