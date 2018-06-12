@@ -401,7 +401,7 @@ handle_info(?BUILD_GRAPH_MESSAGE, #state{backend=Backend,
 
     case Connected of
         true ->
-            % lager:info("Graph is connected!");
+            lager:info("Graph is connected!"),
             ok;
         false ->
             lager:info("Visited ~p from ~p: ~p", [length(VisitedNames), node(), VisitedNames]),
