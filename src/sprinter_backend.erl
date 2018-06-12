@@ -339,7 +339,7 @@ handle_info(?ARTIFACT_MESSAGE, #state{peer_service=PeerService}=State) ->
     %% Store membership.
     Node = prefix(atom_to_list(node())),
     Membership = term_to_binary(Nodes),
-    lager:info("Membership for node ~p: ~p", [Node, Nodes]),
+    % lager:info("Membership for node ~p: ~p", [Node, Nodes]),
     upload_artifact(State, Node, Membership),
 
     %% Store membership with node tag.

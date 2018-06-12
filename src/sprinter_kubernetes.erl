@@ -37,7 +37,7 @@ upload_artifact(#state{eredis=Eredis}, Node, Membership) ->
 
 %% @private
 download_artifact(#state{eredis=Eredis}, Node) ->
-    lager:info("Retrieving object ~p from redis.", [Node]),
+    % lager:info("Retrieving object ~p from redis.", [Node]),
 
     try
         case eredis:q(Eredis, ["GET", Node]) of
