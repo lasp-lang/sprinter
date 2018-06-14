@@ -26,6 +26,8 @@
 
 -behaviour(gen_server).
 
+-define(TIMEOUT, 10000).
+
 %% API
 -export([start_link/0,
          start_link/1,
@@ -79,27 +81,27 @@ start_link(Opts) ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, Opts, []).
 
 graph() ->
-    gen_server:call(?MODULE, graph, infinity).
+    gen_server:call(?MODULE, graph, ?TIMEOUT).
 
 tree() ->
-    gen_server:call(?MODULE, tree, infinity).
+    gen_server:call(?MODULE, tree, ?TIMEOUT).
 
 was_connected() ->
-    gen_server:call(?MODULE, was_connected, infinity).
+    gen_server:call(?MODULE, was_connected, ?TIMEOUT).
 
 orchestration() ->
-    gen_server:call(?MODULE, orchestration, infinity).
+    gen_server:call(?MODULE, orchestration, ?TIMEOUT).
 
 orchestrated() ->
-    gen_server:call(?MODULE, orchestrated, infinity).
+    gen_server:call(?MODULE, orchestrated, ?TIMEOUT).
 
 -spec servers() -> {ok, [node()]}.
 servers() ->
-    gen_server:call(?MODULE, servers, infinity).
+    gen_server:call(?MODULE, servers, ?TIMEOUT).
 
 -spec nodes() -> {ok, [node()]}.
 nodes() ->
-    gen_server:call(?MODULE, nodes, infinity).
+    gen_server:call(?MODULE, nodes, ?TIMEOUT).
 
 %%%===================================================================
 %%% gen_server callbacks
