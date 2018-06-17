@@ -26,7 +26,7 @@
 
 -behaviour(gen_server).
 
--define(TIMEOUT, 10000).
+-define(TIMEOUT, infinity).
 
 %% API
 -export([start_link/0,
