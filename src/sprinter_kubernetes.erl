@@ -132,9 +132,7 @@ generate_pod_node(Name, Host) ->
 %% @private
 get_request(Url, DecodeFun) ->
     Headers = headers(),
-    SSLOptions = [{cacertfile, "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"}],
-    HTTPOptions = [{ssl, SSLOptions}],
-    case httpc:request(get, {Url, Headers}, HTTPOptions, [{body_format, binary}]) of
+    case httpc:request(get, {Url, Headers}, [], [{body_format, binary}]) of
         {ok, {{_, 200, _}, _, Body}} ->
             {ok, DecodeFun(Body)};
         Other ->
