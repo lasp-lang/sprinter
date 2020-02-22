@@ -114,7 +114,7 @@ init([]) ->
         {Value, false, false} when is_list(Value) ->
             sprinter_mesos;
         {false, Value, false} when is_list(Value) ->
-            sprinter_kubernetes;
+            sprinter_kubernetes_ext;
         {false, false, Value} when is_list(Value) ->
             sprinter_compose;
         {_, _, _} ->
@@ -181,7 +181,7 @@ init([]) ->
     end,
 
     Eredis = case Backend of
-        sprinter_kubernetes ->
+        sprinter_kubernetes_ext ->
             RedisHost = os:getenv("REDIS_SERVICE_HOST", "127.0.0.1"),
             RedisPort = os:getenv("REDIS_SERVICE_PORT", "6379"),
             {ok, C} = eredis:start_link(RedisHost, list_to_integer(RedisPort)),
@@ -223,7 +223,7 @@ handle_call(orchestration, _From, #state{backend=Backend}=State) ->
             false;
         sprinter_mesos ->
             mesos;
-        sprinter_kubernetes ->
+        sprinter_kubernetes_ext ->
             kubernetes
     end,
     {reply, {ok, Result}, State};
