@@ -79,9 +79,9 @@ pods_from_kubernetes(LabelSelector) ->
     end.
 
 %% @private
-generate_pods_url(LabelSelector) ->
+generate_pods_url(_LabelSelector) ->
     APIServer = os:getenv("APISERVER"),
-    APIServer ++ "/api/v1/pods?labelSelector=" ++ LabelSelector.
+    APIServer ++ "/api/v1/namespaces/default/endpoints".
 
 %% @private
 generate_pod_nodes(#{<<"items">> := Items}) ->
@@ -89,37 +89,45 @@ generate_pod_nodes(#{<<"items">> := Items}) ->
         null ->
             sets:new();
         _ ->
-            Nodes = lists:foldr(
-                fun(Item, Acc) ->
+            Nodes =
+                lists:foldr(
+                    fun(Item, Acc) ->
+                        %% get name if defined
+                        Name =
+                            case maps:is_key(<<"metadata">>, Item) of
+                                true ->
+                                    Metadata = maps:get(<<"metadata">>, Item),
+                                    Name0 = maps:get(<<"name">>, Metadata, undefined),
+                                    case string:find(Name0, "lasp", leading) of
+                                        nomatch ->
+                                            undefined;
+                                        _ ->
+                                            Name0
+                                    end;
+                                false ->
+                                    undefined
+                            end,
 
-                    %% get name if defined
-                    Name = case maps:is_key(<<"metadata">>, Item) of
-                        true ->
-                            Metadata = maps:get(<<"metadata">>, Item),
-                            maps:get(<<"name">>, Metadata, undefined);
-                        false ->
-                            undefined
+                        %% get pod ip if defined
+                        PodIP =
+                            case maps:is_key(<<"subsets">>, Item) of
+                                true ->
+                                    [FirstSubset] = maps:get(<<"subsets">>, Item),
+                                    [FirstAddress] = maps:get(<<"addresses">>, FirstSubset),
+                                    maps:get(<<"ip">>, FirstAddress, undefined);
+                                false ->
+                                    undefined
+                            end,
+
+                        case Name /= undefined andalso PodIP /= undefined of
+                            true ->
+                                [generate_pod_node(Name, PodIP) | Acc];
+                            false ->
+                                Acc
+                        end
                     end,
-
-                    %% get pod ip if defined
-                    PodIP = case maps:is_key(<<"status">>, Item) of
-                        true ->
-                            Status = maps:get(<<"status">>, Item),
-                            maps:get(<<"podIP">>, Status, undefined);
-                        false ->
-                            undefined
-                    end,
-
-                    case Name /= undefined andalso PodIP /= undefined of
-                        true ->
-                            [generate_pod_node(Name, PodIP) | Acc];
-                        false ->
-                            Acc
-                    end
-                end,
-                [],
-                Items
-            ),
+                    [],
+                    Items),
             sets:from_list(Nodes)
     end.
 
